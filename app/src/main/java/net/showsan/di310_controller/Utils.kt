@@ -1,5 +1,6 @@
 package net.showsan.di310_controller
 
+import android.util.Log
 import kotlin.experimental.xor
 
 /**
@@ -55,4 +56,24 @@ fun getXorCheckSum(src: ByteArray): Byte {
         checksum = checksum xor src[i]
     }
     return checksum
+}
+
+fun getXorCheckSum(src: String): String {
+    var checksum = src.slice(0..1).toInt(16)
+    for (i in 2 until src.length step 2) {
+        checksum = checksum xor src.slice(i..i + 1).toInt(16)
+    }
+    return checksum.toString(16)
+}
+
+fun getCheckSum(src: String): String {
+    var total = 0
+    for (i in 0 until src.length step 2) {
+        total += src.slice(i..i + 1).toInt(16)
+    }
+    var hex = (total % 256).toString(16)
+    if (hex.length < 2) {
+        hex = "0" + hex
+    }
+    return hex
 }

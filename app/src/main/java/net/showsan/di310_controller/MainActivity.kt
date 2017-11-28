@@ -2,6 +2,7 @@ package net.showsan.di310_controller
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.ToggleButton
 import org.jetbrains.anko.setContentView
 import org.jetbrains.anko.toast
@@ -31,12 +32,40 @@ class MainActivity : AppCompatActivity() {
         ui.recDataTxt?.text = ""
     }
 
-    fun send(command: Pair<String, String>) {
+    fun send(name: String, send: String) {
         if (!com.isOpen()) return toast("Port has not opened")
         val dateFormat = SimpleDateFormat("hh:mm:ss")
         val time = dateFormat.format(java.util.Date())
-        setRecDataTxt(time, com.getPort(), command.first)
-        sendPortData(com, command.second)
+        setRecDataTxt(time, com.getPort(), name)
+        sendPortData(com, send)
+    }
+
+    fun send(text: String) {
+        if (text.length == 0) return;
+        send(text, text);
+    }
+
+    fun send(command: Pair<String, String>) {
+        send(command.first, command.second)
+    }
+
+    fun sendWithParams(command: Pair<String, String>, params: String) {
+        if (params.length == 0) return toast("Need params")
+
+        var temp = command.second.replace("*", params)
+
+        var length = (2 + params.length + 2).toString(16).toUpperCase() // Command Code length + Command Data length + Checksum length
+        while (length.length < 4) {
+            length = "0" + length
+        }
+        temp = temp.replace("?", length)
+
+        val code = command.second.split("?")[1].split("*")[0]
+        val checksum = getXorCheckSum((code + params)).toUpperCase()
+
+        val text = temp + checksum
+        //send(command.first, text)
+        send(text)
     }
 
     fun toggleCom(port: String, baudrate: String, toggleButton: ToggleButton?) {

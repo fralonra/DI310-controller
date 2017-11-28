@@ -72,13 +72,6 @@ abstract class Serialer {
                 val buffer = ByteArray(512)
                 val size = inputStream?.read(buffer) ?: 0
                 if (size > 0) {
-                    Log.d("sscc", "-----------$size")
-                    val b = Arrays.copyOfRange(buffer, 0, size)
-                    var sta = ""
-                    for (i in 0 until size) {
-                        sta += b[i].toChar()
-                    }
-                    Log.d("sscc", sta)
                     val data = ComData(port, buffer, size)
                     onDataReceived(data)
                 }
